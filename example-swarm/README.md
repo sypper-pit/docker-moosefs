@@ -1,3 +1,5 @@
+to create virtual disk use `setup_virtual_disk.sh`
+
 ```console
 $ docker swarm init # (or "docker swarm join ...")
 
