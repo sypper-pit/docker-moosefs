@@ -12,13 +12,19 @@ services:
   master:
     image: tianon/moosefs:3
     command: mfsmaster -fun
-    networks: { default: { aliases: [ 'mfsmaster' ] } }
-    deploy: { mode: replicated, replicas: 1, endpoint_mode: dnsrr }
-    user: 9400:9400
+    networks:
+      default:
+        aliases:
+          - mfsmaster
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+    user: "9400:9400"
     hostname: '{{ .Service.Name }}'
     volumes:
       - type: bind
-        source: /mnt/mfs/master
+        source: /mnt/moosefs/virtual_disk
         target: /mnt/mfs/master
       - type: bind
         source: /etc/localtime
@@ -34,12 +40,14 @@ services:
   metalogger:
     image: tianon/moosefs:3
     command: mfsmetalogger -fun
-    deploy: { mode: global, endpoint_mode: dnsrr }
-    user: 9400:9400
+    deploy:
+      mode: global
+      endpoint_mode: dnsrr
+    user: "9400:9400"
     hostname: '{{ .Service.Name }}.{{ .Node.Hostname }}'
     volumes:
       - type: bind
-        source: /mnt/mfs/master
+        source: /mnt/moosefs/virtual_disk
         target: /mnt/mfs/master
       - type: bind
         source: /etc/localtime
@@ -52,7 +60,7 @@ services:
   cgiserv:
     image: tianon/moosefs:3
     command: mfscgiserv -fv
-    user: 9400:9400
+    user: "9400:9400"
     # TODO how to expose 9425 without publishing it?? likely a second "public" network with some kind of reverse proxy to add some authentication on it
     # ("docker service update --publish-add 9425:9425 mfs_cgiserv" for poor-man solution)
     volumes:
